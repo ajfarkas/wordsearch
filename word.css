@@ -1,0 +1,112 @@
+* {
+	margin: 0;
+}
+
+html {
+	background-color: pink;
+	font-size: 6.25%
+}
+
+body {
+	font-size: 16rem;
+	padding: 16px
+}
+
+fieldset {
+	display: inline-block;
+}
+
+label {
+	display: block;
+}
+label.inline {
+	display: inline-block;
+	margin-right: 8px;
+}
+
+.main {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 16px;
+	margin-bottom: 16px;
+}
+
+
+.create {
+	flex: 0 0 auto;
+}
+
+#grid {
+	display: inline-block;
+	font-family: monospace;
+	font-size: 16rem;
+	outline: 1px solid black;
+	margin-right: 16px;
+	margin-bottom: 16px;
+}
+
+.row {
+}
+
+.cell {
+	display: inline-block;
+	width: 20rem;
+	height: 20rem;
+	background-color: white;
+	text-transform: uppercase;
+	text-align: center;
+	border: 0.5px solid black;
+}
+
+.overwrite {
+	background-color: cadetblue;
+	color: white;
+}
+
+#suggestions {
+	padding: 0;
+}
+.suggestion {
+	list-style-type: none;
+}
+.suggestion > * {
+	display: inline-block;
+}
+[type="checkbox"] {
+	margin-right: 0.5em;
+}
+
+.word-item:hover,
+.word-item:focus {
+	margin-left: -1em;
+	list-style-type: none;
+	text-decoration: underline;
+}
+.word-item:hover:before,
+.word-item:focus:before {
+	content: 'X';
+	margin-right: 0.38em;
+}
+
+input:invalid + button {
+	display: none;
+}
+
+@media print {
+	fieldset,
+	.suggestions {
+		display: none;
+	}
+
+	.main {
+		margin: 2cm;
+	}
+
+	#grid {
+		outline: none;
+	}
+
+	.cell {
+		border: none;
+	}
+}
