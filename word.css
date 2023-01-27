@@ -49,7 +49,7 @@ label.inline {
 }
 
 .cell {
-	display: inline-block;
+	display: table-cell;
 	width: 20rem;
 	height: 20rem;
 	background-color: white;

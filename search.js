@@ -77,19 +77,20 @@ const addSuggestion = word => {
 
 const checkForWords = ({x, y}) => {
 	suggestions.replaceChildren();
-	const rowLetters = $(`[data-row="${y}"]`)
-		.innerText;
+	const rowLetters = [];
+	for (const rowChar of $(`[data-row="${y}"]`).children) {
+		rowLetters.push(rowChar.textContent || ' ');
+	}
 	const colLetters = new Array(
 		...$$(`[data-col="${x}"]`)
-	).map(el => el.innerText).join('');
+	).map(el => el.textContent || ' ');
 	// TODO this ignores spaces, giving invalid words
 
-	[rowLetters, colLetters].forEach(letters => {
-		const letterArray = letters.split('');
+	[rowLetters, colLetters].forEach(letterArray => {
 		const wordCandidates = [];
 
 		letterArray.forEach((letter, li) => {
-			const candidates = mainWordList[letter];
+			const candidates = mainWordList[letter] || [];
 			const letterSet = letterArray.slice(li).join('');
 
 			candidates.forEach(candidate => {
@@ -120,7 +121,8 @@ const checkForWords = ({x, y}) => {
 };
 
 const onInput = ev => {
-	if (ev.metaKey && !ev.key.match('Arrow')) return;
+	if (ev.metaKey && !ev.key.match('Arrow')
+		|| ev.key === 'Tab') return;
 	ev.preventDefault();
 	const { key, target, metaKey } = ev;
 	const { dataset: { coords }} = target;
