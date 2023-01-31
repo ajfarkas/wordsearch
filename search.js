@@ -100,20 +100,7 @@ const checkForWords = ({x, y}) => {
 				}
 			});
 		});
-		// let wordCandidates = mainWordList.filter(word => {
-		// 	const wordRegex = new RegExp(word, 'gi');
-		// 	const matchList = letters.match(wordRegex)
-		// 	return matchList ? matchList[0]: false;
-		// });
-		// wordCandidates = wordCandidates.filter(word => {
-		// 	let subset = false;
-		// 	wordCandidates.some(wc => {
-		// 		if (wc !== word && wc.match(word)) {
-		// 			return subset = true;
-		// 		}
-		// 	})
-		// 	return !subset;
-		// });
+
 		wordCandidates.forEach(word => {
 			addSuggestion(word);
 		});

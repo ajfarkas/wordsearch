@@ -3,13 +3,13 @@
 }
 
 html {
-	background-color: pink;
 	font-size: 6.25%
 }
 
 body {
 	font-size: 16rem;
-	padding: 16px
+	padding: 16px;
+	background-color: papayawhip;
 }
 
 fieldset {
