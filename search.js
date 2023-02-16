@@ -2,6 +2,7 @@ const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
 const getById = id => document.getElementById(id);
 let mainWordList = '';
+const gridMatrix = [];
 
 fetch('./wordlist.json', {
 	headers: {'Content-Type': 'text/json'},
@@ -26,33 +27,56 @@ let height = 0;
 
 const findCell = ({x, y}) => $(`[data-coords="${x},${y}"]`);
 
-const highlightWord = () => {
+const highlightWord = ev => {
+	const wordLoc = ev.target.dataset.location;
+	if (!wordLoc) return console.warn('TODO: ask person to highlight word');
 
+	const [start, end] = wordLoc.split(';');
+	const [startX, startY] = start.split(',');
+	const [endX, endY] = end.split(',');
+	for (let y = startY; y <= endY; y++) {
+		for (let x = startX; x <= endX; x++) {
+			findCell({x, y}).classList.add('isSelected');
+		}
+	}
 };
+
+const clearHighlight = () => {
+	$$('.isSelected').forEach(el => el.classList.remove('isSelected'));
+};
+
+const isInWordList = word => !!wordList.querySelector(`[data-word="${word}"]`);
 
 const removeFromWordList = word => {
 	$(`[data-word="${word}"]`).remove();
 };
 
-const addToWordList = word => {
+const addToWordList = ({word, location}) => {
 	const wordCap = word.toUpperCase();
+	if (isInWordList(wordCap)) return;
 
 	const wordItem = document.createElement('li');
 	wordItem.classList.add('word-item');
 	wordItem.setAttribute('tabIndex', '0');
 	wordItem.textContent = wordCap;
 	wordItem.dataset.word = wordCap;
+	wordItem.dataset.location = location || '';
 	wordList.appendChild(wordItem);
-
+	// Remove from list
 	wordItem.addEventListener('click', () => {
 		removeFromWordList(wordCap);
 	});
 	wordItem.addEventListener('keydown', ev => {
 		if (ev.key === 'Enter') removeFromWordList(wordCap);
 	});
+	// Highlight in grid
+	wordItem.addEventListener('mouseover', highlightWord);
+	wordItem.addEventListener('mouseout', clearHighlight);
+	wordItem.addEventListener('focus', highlightWord);
+	wordItem.addEventListener('blur', clearHighlight);
 };
 
-const addSuggestion = word => {
+const addSuggestion = ({word, location}) => {
 	const suggestionItem = document.createElement('li');
 	const suggestionBox = document.createElement('input');
 	const suggestionText = document.createElement('p');
@@ -69,7 +93,7 @@ const addSuggestion = word => {
 
 	suggestionBox.addEventListener('click', ev => {
 		if (ev.target.checked) {
-			addToWordList(word);
+			addToWordList({word, location});
 			suggestionItem.remove();
 		}
 	});
@@ -77,16 +101,10 @@ const addSuggestion = word => {
 
 const checkForWords = ({x, y}) => {
 	suggestions.replaceChildren();
-	const rowLetters = [];
-	for (const rowChar of $(`[data-row="${y}"]`).children) {
-		rowLetters.push(rowChar.textContent || ' ');
-	}
-	const colLetters = new Array(
-		...$$(`[data-col="${x}"]`)
-	).map(el => el.textContent || ' ');
-	// TODO this ignores spaces, giving invalid words
+	const rowLetters = gridMatrix[y];
+	const colLetters = gridMatrix.map(row => row[x]);
 
-	[rowLetters, colLetters].forEach(letterArray => {
+	[rowLetters, colLetters].forEach((letterArray, laIndex) => {
 		const wordCandidates = [];
 
 		letterArray.forEach((letter, li) => {
@@ -96,13 +114,21 @@ const checkForWords = ({x, y}) => {
 			candidates.forEach(candidate => {
 				if (letterSet.match(candidate)
 					&& !wordCandidates.includes(candidate)) {
-					wordCandidates.push(candidate);
+					const startCoord = laIndex
+						? `${x},${li}`
+						: `${li},${y}`;
+					const endCoord = laIndex
+						? `${x},${li + candidate.length - 1}`
+						: `${li + candidate.length - 1},${y}`;
+					const location = `${startCoord};${endCoord}`;
+
+					wordCandidates.push([candidate, location]);
 				}
 			});
 		});
 
 		wordCandidates.forEach(word => {
-			addSuggestion(word);
+			addSuggestion({word: word[0], location: word[1]});
 		});
 	});
 };
@@ -155,6 +181,7 @@ const onInput = ev => {
 			if (metaKey) {
 				break;
 			} else if (key === 'Backspace') {
+				gridMatrix[y][x] = ' ';
 				target.textContent = '';
 				target.classList.remove('overwrite');
 				checkForWords({x, y});
@@ -162,7 +189,10 @@ const onInput = ev => {
 				if (target.textContent && target.textContent !== key) {
 					target.classList.add('overwrite');
 				}
-				target.textContent = key.toUpperCase();
+				const displayKey = key.toUpperCase();
+				gridMatrix[y][x] = displayKey;
+				target.textContent = displayKey;
+
 				if (key.match(/[a-z]/) && x < width - 1) {
 					findCell({ x: x + 1, y }).focus();
 				} else if (key.match(/[A-Z]/) && y < height - 1) {
@@ -175,6 +205,8 @@ const onInput = ev => {
 };
 
 const createGridCell = ({y, x}) => {
+	gridMatrix[y].push(' ');
+
 	const el = document.createElement('div');
 	el.setAttribute('contentEditable', true);
 	el.classList.add('cell');
@@ -192,6 +224,8 @@ const generateGrid = () => {
 	height = heightInput.value;
 
 	for (let y = 0; y < height; y++) {
+		gridMatrix.push([]);
+
 		const row = document.createElement('div');
 		row.classList.add('row');
 		row.dataset.row = y;
@@ -216,6 +250,7 @@ wordInput.addEventListener('keydown', ev => {
 addWordBtn.addEventListener('click', () => {
 	if (!wordInput.checkValidity()) return;
 
-	addToWordList(wordInput.value);
+	addToWordList({word: wordInput.value});
+	// TODO: ask person to highlight word
 	wordInput.value = '';
 });
