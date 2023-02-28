@@ -28,6 +28,16 @@
 			<ul id="suggestions"></ul>
 		</div>
 	</div>
+	<aside class="autofill">
+		<fieldset>
+			<label for="autofill-opts">Letter distribution type</label>
+			<select id="autofill-opts">
+				<option class="autofill-opt" default value="DICTS">dictionaries</option>
+				<option class="autofill-opt" value="TEXTS">texts</option>
+			</select>
+			<button type="button" id="btn-autofill">Fill empty spaces</button>
+		</fieldset>
+	</aside>
 	<aside class="words">
 		<fieldset>
 			<label for="add-word">Add to word list</label>
@@ -39,4 +49,5 @@
 </section>
 </body>
 <script	type="text/javascript" src="./search.js"></script>
+<script type="text/javascript" src="./distributions.js"></script>
 </html>

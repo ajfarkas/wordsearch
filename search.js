@@ -3,6 +3,7 @@ const $$ = selector => document.querySelectorAll(selector);
 const getById = id => document.getElementById(id);
 let mainWordList = '';
 const gridMatrix = [];
+const letterDistros = {};
 
 fetch('./wordlist.json', {
 	headers: {'Content-Type': 'text/json'},
@@ -20,12 +21,59 @@ const generateBtn = getById('btn-generate');
 const suggestions = getById('suggestions');
 const wordList = getById('wordlist');
 const wordInput = getById('add-word');
-const addWordBtn =getById('btn-addword');
+const addWordBtn = getById('btn-addword');
+const fillSelect = getById('autofill-opts');
+const fillBtn = getById('btn-autofill');
 
 let width = 0;
 let height = 0;
 
 const findCell = ({x, y}) => $(`[data-coords="${x},${y}"]`);
+
+const letterDistroAsArray = value => {
+	if (letterDistros[value]) return letterDistros[value];
+	// define chosen frequency as array
+	const distro = Object.entries(DISTRIBUTIONS).map(([letter, vals]) =>
+		[letter, vals[value] / 100]
+	);
+	distro.sort((a, b) => a[1] < b[1] ? 1 : -1);
+	distro.reduce((acc, curr, dIndex) => {
+		const freq = curr[1];
+		const max = acc + freq;
+		distro[dIndex][2] = max;
+
+		return max;
+	}, 0);
+	letterDistros[value] = distro;
+
+	return distro;
+}
+
+const fillEmptyCells = () => {
+	const distro = letterDistroAsArray(fillSelect.value);
+	// walk through each empty cell
+	gridMatrix.forEach((row, y) => {
+		row.forEach((cell, x) => {
+			if (!cell || cell === ' ') {
+				const random = Math.random();
+				const setLetter = l => {
+					gridMatrix[y][x] = l;
+					findCell({ x, y}).innerText = l;
+				};
+				const letterFound = distro.some(([letter, freq, max]) => {
+					if (random <= max) {
+						setLetter(letter);
+						return true;
+					}
+					return false;
+				});
+				if (!letterFound) {
+					setLetter('S');
+				}
+			}
+		})
+	});
+};
 
 const highlightWord = ev => {
 	const wordLoc = ev.target.dataset.location;
@@ -254,3 +302,4 @@ addWordBtn.addEventListener('click', () => {
 	// TODO: ask person to highlight word
 	wordInput.value = '';
 });
+fillBtn.addEventListener('click', fillEmptyCells);
