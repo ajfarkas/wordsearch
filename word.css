@@ -81,6 +81,15 @@ label.inline {
 	margin-right: 0.5em;
 }
 
+#use-nextpage {
+	margin-top: 8px;
+	margin-right: 0.2em;
+}
+
+.check-label {
+	display: inline-block;
+}
+
 .word-item:hover,
 .word-item:focus {
 	margin-left: -1em;
@@ -98,20 +107,43 @@ input:invalid + button {
 }
 
 @media print {
+	.print-ghost {
+		display: none;
+	}
+
+	body {
+		background-color: white;
+	}
+
+	.overwrite {
+		background-color: white;
+		color: black;
+	}
+
 	fieldset,
 	.suggestions {
 		display: none;
 	}
 
-	.main {
-		margin: 2cm;
-	}
-
 	#grid {
+		margin: 1cm;
 		outline: none;
 	}
 
 	.cell {
 		border: none;
+	}
+
+	.word-items {
+		column-count: 3;
+		column-width: 28vw;
+		padding: 0;
+		margin-left: 16px;
+		list-style-type: circle;
+	}
+
+	#use-nextpage:checked ~ .word-items {
+		page-break-before: always;
+		margin-top: 1cm;
 	}
 }
