@@ -267,6 +267,7 @@ const createGridCell = ({y, x}) => {
 
 const generateGrid = () => {
 	grid.replaceChildren();
+	gridMatrix.splice(0, gridMatrix.length);
 
 	width = widthInput.value;
 	height = heightInput.value;
