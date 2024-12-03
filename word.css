@@ -3,7 +3,8 @@
 }
 
 html {
-	font-size: 6.25%
+	font-size: 6.25%;
+	--columns: 16;
 }
 
 body {
@@ -113,6 +114,7 @@ input:invalid + button {
 
 	body {
 		background-color: white;
+		margin: 1vw;
 	}
 
 	.overwrite {
@@ -126,12 +128,13 @@ input:invalid + button {
 	}
 
 	#grid {
-		margin: 1cm;
 		outline: none;
 	}
 
 	.cell {
 		border: none;
+		font-size: calc(90vw / var(--columns));
+		width: 1em;
 	}
 
 	.word-items {
@@ -140,6 +143,7 @@ input:invalid + button {
 		padding: 0;
 		margin-left: 16px;
 		list-style-type: circle;
+		font-size: calc(90vw / var(--columns));
 	}
 
 	#use-nextpage:checked ~ .word-items {

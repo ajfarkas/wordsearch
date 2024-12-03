@@ -283,6 +283,8 @@ const generateGrid = () => {
 			row.appendChild(createGridCell({x, y}));
 		}
 	}
+
+	$('html').style.setProperty('--columns', width);
 };
 
 generateGrid();
